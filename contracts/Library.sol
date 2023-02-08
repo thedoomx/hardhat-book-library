@@ -7,7 +7,7 @@ import "./LibraryEvents.sol";
 
 contract Library is Ownable, LibraryHistory, LibraryEvents {
     struct Book {
-        uint id;
+        uint256 id;
         string name;
         string author;
         uint16 copies;
@@ -17,16 +17,27 @@ contract Library is Ownable, LibraryHistory, LibraryEvents {
     uint48 private _counter = 0;
     uint48 private _availableBooksCounter = 0;
 
-    mapping(uint => Book) private _idToBook;
+    mapping(uint256 => Book) private _idToBook;
 
-    mapping(address => mapping(uint => bool)) private _addressCurrentlyBorrowed;
+    mapping(address => mapping(uint256 => bool))
+        private _addressCurrentlyBorrowed;
 
-    modifier requireAddressCurrentlyBorrowedBook(uint _bookId, bool requirement) {
-        require(_addressCurrentlyBorrowed[msg.sender][_bookId] == requirement, "You do not meet the book requirement.");
+    modifier requireAddressCurrentlyBorrowedBook(
+        uint256 _bookId,
+        bool requirement
+    ) {
+        require(
+            _addressCurrentlyBorrowed[msg.sender][_bookId] == requirement,
+            "You do not meet the book requirement."
+        );
         _;
     }
 
-    function addBook(string memory _name, string memory _author, uint16 _copies) public onlyOwner {
+    function addBook(
+        string memory _name,
+        string memory _author,
+        uint16 _copies
+    ) public onlyOwner {
         Book memory book = Book(_counter, _name, _author, _copies, _copies);
         _idToBook[_counter] = book;
 
@@ -38,10 +49,10 @@ contract Library is Ownable, LibraryHistory, LibraryEvents {
 
     function getAvailableBooks() external view returns (Book[] memory) {
         Book[] memory availableBooks = new Book[](_availableBooksCounter);
-        uint _booksAdded = 0;
+        uint256 _booksAdded = 0;
 
-        for(uint i = 0; i <= _counter; i++) {
-            if(_idToBook[i].availableCopies > 0) {
+        for (uint256 i = 0; i <= _counter; i++) {
+            if (_idToBook[i].availableCopies > 0) {
                 availableBooks[_booksAdded] = _idToBook[i];
                 _booksAdded++;
             }
@@ -50,13 +61,20 @@ contract Library is Ownable, LibraryHistory, LibraryEvents {
         return availableBooks;
     }
 
-    function borrowBook(uint _bookId) external requireAddressCurrentlyBorrowedBook(_bookId, false) returns(Book memory) {
-        require(_idToBook[_bookId].availableCopies > 0, "There are no available copies left.");
+    function borrowBook(uint256 _bookId)
+        external
+        requireAddressCurrentlyBorrowedBook(_bookId, false)
+        returns (Book memory)
+    {
+        require(
+            _idToBook[_bookId].availableCopies > 0,
+            "There are no available copies left."
+        );
 
         Book storage bookToBorrow = _idToBook[_bookId];
         bookToBorrow.availableCopies--;
 
-        if(bookToBorrow.availableCopies == 0) {
+        if (bookToBorrow.availableCopies == 0) {
             _availableBooksCounter--;
         }
 
@@ -66,9 +84,12 @@ contract Library is Ownable, LibraryHistory, LibraryEvents {
         return bookToBorrow;
     }
 
-    function returnBook(uint _bookId) external requireAddressCurrentlyBorrowedBook(_bookId, true){
+    function returnBook(uint256 _bookId)
+        external
+        requireAddressCurrentlyBorrowedBook(_bookId, true)
+    {
         Book storage bookToReturn = _idToBook[_bookId];
-         if(bookToReturn.availableCopies == 0) {
+        if (bookToReturn.availableCopies == 0) {
             _availableBooksCounter++;
         }
         bookToReturn.availableCopies++;
