@@ -31,6 +31,9 @@ module.exports = {
   },
   networks: {
     //defaultNetwork: "goerli",
+    localhost: {
+      allowUnlimitedContractSize: true,
+    },
     hardhat: {},
     goerli: {
       url: GOERLI_URL,
