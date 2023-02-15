@@ -8,13 +8,11 @@ const run = async function () {
     let availableBooks = await libraryContract.getAvailableBooks();
     let availableBooksLength = availableBooks.length;
 
-    const addBookResult = await _addBook(libraryContract, availableBooksLength);
-    if (addBookResult == false) {
+    if (await _addBook(libraryContract, availableBooksLength) == false) {
         return;
     }
 
-    const borrowBookResult = await _borrowBook(libraryContract, availableBooksLength);
-    if (borrowBookResult == false) {
+    if (await _borrowBook(libraryContract, availableBooksLength) == false) {
         return;
     }
 
@@ -23,8 +21,7 @@ const run = async function () {
     console.log("Available books after borrow:", availableBooksLength);
     console.log("Total books:", availableBooksLength + 1);
 
-    const returnBookResult = await _returnBook(libraryContract, availableBooksLength);
-    if (returnBookResult == false) {
+    if (await _returnBook(libraryContract, availableBooksLength) == false) {
         return;
     }
 
@@ -53,7 +50,7 @@ async function _borrowBook(libraryContract, availableBooksLength) {
     if (transactionBorrowBookReceipt.status != 1) {
         console.log("Transaction for borrow book was not successful");
         return false;
-    } 
+    }
 
     return true;
 }
